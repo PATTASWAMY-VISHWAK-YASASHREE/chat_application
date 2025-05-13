@@ -155,6 +155,67 @@ wss.on('connection', (ws) => {
         const messageStr = message.toString();
         console.log(`Received: ${messageStr}`);
         
+        // Handle admin login
+        if (messageStr.startsWith('{"type":"admin_login"')) {
+            try {
+                const data = JSON.parse(messageStr);
+                
+                if (SERVER_TYPE !== 'admin') {
+                    ws.send(JSON.stringify({
+                        type: 'admin_login_response',
+                        success: false,
+                        message: 'Admin login is only allowed on the admin server'
+                    }));
+                    return;
+                }
+                
+                if (data.username === ADMIN_USERNAME && data.password === config.ADMIN_PASSWORD) {
+                    // Set as admin
+                    adminClient = ws;
+                    clientUsernames.set(ws, ADMIN_USERNAME);
+                    activeClients.push(ws);
+                    
+                    // Send success response
+                    ws.send(JSON.stringify({
+                        type: 'admin_login_response',
+                        success: true
+                    }));
+                    
+                    console.log('Admin authenticated');
+                    
+                    // Send welcome message
+                    ws.send(`Welcome to the chat, ${ADMIN_USERNAME}!`);
+                    
+                    // Send user settings
+                    ws.send(JSON.stringify({
+                        type: 'settings',
+                        theme: 'space',
+                        username: ADMIN_USERNAME,
+                        serverType: SERVER_TYPE,
+                        isAdmin: true
+                    }));
+                    
+                    // Send list of active users
+                    broadcastUserList();
+                    
+                    // Send pending requests
+                    sendPendingRequestsToAdmin(ws);
+                    
+                    // Broadcast join message
+                    broadcastMessage(`${ADMIN_USERNAME} has joined the chat!`, ws);
+                } else {
+                    ws.send(JSON.stringify({
+                        type: 'admin_login_response',
+                        success: false,
+                        message: 'Invalid admin credentials'
+                    }));
+                }
+            } catch (e) {
+                console.error(`Error parsing admin login: ${e}`);
+            }
+            return;
+        }
+        
         // Handle username registration
         if (messageStr.startsWith("USERNAME:")) {
             const username = messageStr.substring(9);
@@ -188,28 +249,36 @@ wss.on('connection', (ws) => {
                 ws.send(`Database status: ${dbAvailable ? 'Connected' : 'Not connected'}`);
                 
                 // Send user settings
-            ws.send(JSON.stringify({
-                type: 'settings',
-                theme: 'space',
-                username: username,
-                serverType: SERVER_TYPE,
-                isAdmin: username === ADMIN_USERNAME
-            }));
-            
-            // Broadcast user list
-            broadcastUserList();
-            
-            // Broadcast join message
-            broadcastMessage(`${username} has joined the chat!`, ws);
-            
-            // If this is the admin, send pending requests
-            if (username === ADMIN_USERNAME) {
-                sendPendingRequestsToAdmin(ws);
-            }
-            
-            // Save to database if available
-            if (dbAvailable) {
-                db.saveMessage('System', `${username} has joined the chat!`);
+                ws.send(JSON.stringify({
+                    type: 'settings',
+                    theme: 'space',
+                    username: username,
+                    serverType: SERVER_TYPE,
+                    isAdmin: username === ADMIN_USERNAME
+                }));
+                
+                // Broadcast user list
+                broadcastUserList();
+                
+                // Broadcast join message
+                broadcastMessage(`${username} has joined the chat!`, ws);
+                
+                // If this is the admin, send pending requests
+                if (username === ADMIN_USERNAME) {
+                    sendPendingRequestsToAdmin(ws);
+                }
+                
+                // Save to database if available
+                if (dbAvailable) {
+                    db.saveMessage('System', `${username} has joined the chat!`);
+                }
+            } else {
+                // User needs permission
+                ws.send(JSON.stringify({
+                    type: 'permission_required',
+                    message: 'You need admin approval to join this chat'
+                }));
+                ws.close();
             }
         } 
         // Handle permission request

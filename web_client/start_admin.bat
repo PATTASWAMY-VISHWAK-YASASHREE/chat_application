@@ -6,7 +6,7 @@ echo ===================================================
 echo.
 
 echo Installing dependencies...
-call npm install ws
+call npm install ws pg
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -21,18 +21,12 @@ echo.
 echo Dependencies installed successfully!
 echo.
 
-echo Starting Admin Server on port 5059...
+echo Starting Admin Server...
 echo.
-echo ===================================================
+echo IMPORTANT: Use the admin.html page to connect as admin
 echo.
 
-call node server.js admin
-
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo ERROR: Server failed to start!
-    echo.
-    pause
-)
+start http://localhost:5059/admin.html
+node fixed_server.js admin
 
 pause

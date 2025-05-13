@@ -6,7 +6,7 @@ echo ===================================================
 echo.
 
 echo Installing dependencies...
-call npm install ws
+call npm install ws pg
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -21,21 +21,14 @@ echo.
 echo Dependencies installed successfully!
 echo.
 
-echo Starting User Server on port 5000...
+echo Starting User Server...
 echo.
-echo ===================================================
-echo.
-
 echo IMPORTANT: Open your browser to http://localhost:5000
 echo.
+echo NOTE: You will need admin approval to join the chat
+echo.
 
-call node server.js user
-
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo ERROR: Server failed to start!
-    echo.
-    pause
-)
+start http://localhost:5000
+node fixed_server.js user
 
 pause

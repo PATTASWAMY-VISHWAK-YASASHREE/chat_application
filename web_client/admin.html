@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat</title>
+    <title>Galaxy Chat - Admin Panel</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,6 +59,11 @@
             font-style: italic;
         }
         
+        .admin-message {
+            background-color: rgba(255, 100, 100, 0.3);
+            color: #ffcccc;
+        }
+        
         .outgoing {
             background-color: rgba(100, 100, 255, 0.3);
             margin-left: 50px;
@@ -97,16 +102,39 @@
             background-color: rgba(30, 20, 50, 0.8);
             border-radius: 10px;
         }
+        
+        .admin-panel {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(60, 30, 30, 0.8);
+            border-radius: 10px;
+        }
+        
+        .request {
+            background-color: rgba(60, 40, 80, 0.5);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .approve-btn {
+            background-color: rgba(100, 255, 100, 0.6);
+        }
+        
+        .deny-btn {
+            background-color: rgba(255, 100, 100, 0.6);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Simple Galaxy Chat</h1>
+        <h1>Galaxy Chat - Admin Panel</h1>
         
         <div id="login-area" class="login-area">
-            <h2>Enter Username</h2>
-            <input type="text" id="username" placeholder="Your username">
-            <button id="connect">Connect</button>
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username" value="Admin">
+            <input type="password" id="password" placeholder="Password">
+            <button id="connect">Login</button>
         </div>
         
         <div id="chat-area" class="chat-area">
@@ -115,6 +143,14 @@
             <div>
                 <input type="text" id="message" placeholder="Type a message...">
                 <button id="send">Send</button>
+            </div>
+            
+            <div id="admin-panel" class="admin-panel">
+                <h3>Admin Controls</h3>
+                <div id="pending-requests">
+                    <h4>Pending Requests</h4>
+                    <div id="request-list">No pending requests</div>
+                </div>
             </div>
             
             <div id="users">
@@ -129,19 +165,21 @@
         const loginArea = document.getElementById('login-area');
         const chatArea = document.getElementById('chat-area');
         const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
         const connectButton = document.getElementById('connect');
         const messageInput = document.getElementById('message');
         const sendButton = document.getElementById('send');
         const messagesDiv = document.getElementById('messages');
         const userList = document.getElementById('user-list');
+        const requestList = document.getElementById('request-list');
         
         // Connection settings
         const host = window.location.hostname || 'localhost';
-        const port = window.location.port || (window.location.pathname.includes('admin') ? 5059 : 5000);
+        const port = window.location.port || 5059; // Admin port
         
         // Chat state
         let socket = null;
-        let username = '';
+        let username = 'Admin';
         
         // Set up event listeners
         connectButton.addEventListener('click', connect);
@@ -152,8 +190,8 @@
             }
         });
         
-        // Approve a user (admin only)
-        function approveUser(user) {
+        // Approve a user
+        window.approveUser = function(user) {
             if (!socket) return;
             
             try {
@@ -166,10 +204,10 @@
             } catch (error) {
                 console.error('Failed to approve user:', error);
             }
-        }
+        };
         
-        // Deny a user (admin only)
-        function denyUser(user) {
+        // Deny a user
+        window.denyUser = function(user) {
             if (!socket) return;
             
             try {
@@ -182,25 +220,29 @@
             } catch (error) {
                 console.error('Failed to deny user:', error);
             }
-        }
+        };
         
         // Connect to server
         function connect() {
-            username = usernameInput.value.trim();
-            if (!username) {
-                alert('Please enter a username');
+            const password = passwordInput.value.trim();
+            if (!password) {
+                alert('Please enter the admin password');
                 return;
             }
             
             try {
-                console.log(`Connecting to WebSocket at ws://${host}:${port}`);
+                console.log(`Connecting to admin WebSocket at ws://${host}:${port}`);
                 socket = new WebSocket(`ws://${host}:${port}`);
                 
                 socket.onopen = function() {
                     console.log('WebSocket connection established');
-                    // Send username to server
-                    socket.send(`USERNAME:${username}`);
-                    addSystemMessage('Connecting...');
+                    // Send admin login
+                    socket.send(JSON.stringify({
+                        type: 'admin_login',
+                        username: 'Admin',
+                        password: password
+                    }));
+                    addSystemMessage('Connecting to admin server...');
                 };
                 
                 socket.onmessage = function(event) {
@@ -235,6 +277,9 @@
                 
                 // Handle different message types
                 switch (data.type) {
+                    case 'admin_login_response':
+                        handleLoginResponse(data);
+                        break;
                     case 'settings':
                         handleSettings(data);
                         break;
@@ -244,12 +289,8 @@
                     case 'error':
                         addSystemMessage('Error: ' + data.message);
                         break;
-                    case 'permission_required':
-                        addSystemMessage('Permission required: ' + data.message);
-                        showLoginArea();
-                        break;
-                    case 'permission_request_received':
-                        addSystemMessage(data.message);
+                    case 'permission_request':
+                        handlePermissionRequest(data);
                         break;
                     case 'permission_response':
                         handlePermissionResponse(data);
@@ -277,50 +318,68 @@
             }
         }
         
+        // Handle login response
+        function handleLoginResponse(data) {
+            if (data.success) {
+                showChatArea();
+                addSystemMessage('Successfully logged in as Admin');
+            } else {
+                addSystemMessage('Login failed: ' + (data.message || 'Invalid credentials'));
+            }
+        }
+        
         // Handle settings message
         function handleSettings(data) {
             console.log('Handling settings:', data);
             if (data.username === username) {
                 showChatArea();
-                addSystemMessage(`Connected as ${username} on ${data.serverType} server`);
-                if (data.isAdmin) {
-                    addSystemMessage('You are logged in as Admin');
-                }
+                addSystemMessage(`Connected as Admin on ${data.serverType} server`);
             }
+        }
+        
+        // Handle permission request
+        function handlePermissionRequest(data) {
+            addSystemMessage(`Permission request from ${data.username}: ${data.reason || 'No reason provided'}`);
+            
+            // Add to request list
+            const requestDiv = document.createElement('div');
+            requestDiv.className = 'request';
+            requestDiv.innerHTML = `
+                <strong>${data.username}</strong>: ${data.reason || 'No reason provided'}
+                <button class="approve-btn" onclick="approveUser('${data.username}')">Approve</button>
+                <button class="deny-btn" onclick="denyUser('${data.username}')">Deny</button>
+            `;
+            
+            if (requestList.textContent === 'No pending requests') {
+                requestList.innerHTML = '';
+            }
+            
+            requestList.appendChild(requestDiv);
         }
         
         // Handle permission response
         function handlePermissionResponse(data) {
-            if (data.username === username) {
-                if (data.approved) {
-                    addSystemMessage('Your access request was approved! You can now connect.');
-                } else {
-                    addSystemMessage('Your access request was denied.');
-                }
-            } else {
-                addSystemMessage(`User ${data.username} was ${data.approved ? 'approved' : 'denied'} access.`);
-            }
+            addSystemMessage(`User ${data.username} was ${data.approved ? 'approved' : 'denied'} access.`);
         }
         
-        // Handle pending requests (admin only)
+        // Handle pending requests
         function handlePendingRequests(data) {
             if (!data.requests || data.requests.length === 0) {
-                addSystemMessage('No pending access requests.');
+                requestList.innerHTML = 'No pending requests';
                 return;
             }
             
-            addSystemMessage('Pending access requests:');
+            requestList.innerHTML = '';
             data.requests.forEach(req => {
                 const requestDiv = document.createElement('div');
-                requestDiv.className = 'message system';
+                requestDiv.className = 'request';
                 requestDiv.innerHTML = `
                     <strong>${req.username}</strong>: ${req.reason || 'No reason provided'}
-                    <button onclick="approveUser('${req.username}')">Approve</button>
-                    <button onclick="denyUser('${req.username}')">Deny</button>
+                    <button class="approve-btn" onclick="approveUser('${req.username}')">Approve</button>
+                    <button class="deny-btn" onclick="denyUser('${req.username}')">Deny</button>
                 `;
-                messagesDiv.appendChild(requestDiv);
+                requestList.appendChild(requestDiv);
             });
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
         
         // Show chat area
@@ -334,7 +393,7 @@
         function showLoginArea() {
             chatArea.style.display = 'none';
             loginArea.style.display = 'block';
-            usernameInput.focus();
+            passwordInput.focus();
         }
         
         // Send a message
@@ -361,6 +420,10 @@
             users.forEach(user => {
                 const li = document.createElement('li');
                 li.textContent = user;
+                if (user === 'Admin') {
+                    li.style.fontWeight = 'bold';
+                    li.style.color = '#ff9999';
+                }
                 userList.appendChild(li);
             });
         }
@@ -377,9 +440,14 @@
         // Add a chat message
         function addChatMessage(text) {
             const isOutgoing = text.startsWith(`${username}:`);
+            const isAdmin = text.startsWith('Admin:');
             
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
+            if (isAdmin) {
+                messageDiv.className = `message admin-message`;
+            } else {
+                messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
+            }
             messageDiv.textContent = text;
             
             messagesDiv.appendChild(messageDiv);
