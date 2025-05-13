@@ -4,7 +4,7 @@
  */
 
 module.exports = {
-    // Server ports
+    // Default server ports (may be overridden by port scanner)
     ADMIN_PORT: 5059,
     USER_PORT: 5000,
     

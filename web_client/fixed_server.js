@@ -1,14 +1,17 @@
-// fixed_server.js - Fixed version with correct variable order
+// fixed_server.js - Fixed version with correct variable order and port scanning
 const http = require('http');
 const WebSocket = require('ws');
 const fs = require('fs');
 const path = require('path');
+const portScanner = require('./port_scanner');
 
-// Server type and port configuration
+// Server type configuration
 const SERVER_TYPE = process.argv[2] === 'admin' ? 'admin' : 'user';
-const PORT = SERVER_TYPE === 'admin' ? 5059 : 5000;
+// Default ports (will be overridden if not available)
+const DEFAULT_ADMIN_PORT = 5059;
+const DEFAULT_USER_PORT = 5000;
 
-console.log(`Starting ${SERVER_TYPE} server on port ${PORT}`);
+// Port will be determined dynamically
 
 // Global variables
 const activeClients = [];
@@ -136,7 +139,25 @@ wss.on('connection', (ws) => {
     });
 });
 
-// Start the server
-server.listen(PORT, () => {
-    console.log(`${SERVER_TYPE} server running on http://localhost:${PORT}`);
-});
+// Start the server with port scanning
+async function startServer() {
+    try {
+        // Determine which default port to use based on server type
+        const defaultPort = SERVER_TYPE === 'admin' ? DEFAULT_ADMIN_PORT : DEFAULT_USER_PORT;
+        
+        // Find an available port
+        const PORT = await portScanner.findAvailablePort(defaultPort);
+        
+        // Start the server on the available port
+        server.listen(PORT, () => {
+            console.log(`${SERVER_TYPE} server running on http://localhost:${PORT}`);
+            console.log(`WebSocket server running on ws://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error(`Failed to start server: ${error.message}`);
+        process.exit(1);
+    }
+}
+
+// Initialize the server
+startServer();

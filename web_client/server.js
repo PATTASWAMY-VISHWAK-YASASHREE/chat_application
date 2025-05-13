@@ -210,8 +210,8 @@ const server = http.createServer((req, res) => {
     });
 });
 
-// Create WebSocket server
-const wss = new WebSocket.Server({ server: httpServer });
+// WebSocket server is already defined above
+// const wss = new WebSocket.Server({ server: httpServer });
 
 // Process messages serially
 async function processMessageQueue() {
