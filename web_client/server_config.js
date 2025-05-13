@@ -6,7 +6,7 @@
 module.exports = {
     // Server ports
     ADMIN_PORT: 5059,
-    USER_PORT: 5060,
+    USER_PORT: 5000,
     
     // Admin credentials
     ADMIN_USERNAME: 'Admin',

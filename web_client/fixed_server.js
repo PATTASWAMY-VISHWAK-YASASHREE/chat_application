@@ -6,7 +6,7 @@ const path = require('path');
 
 // Server type and port configuration
 const SERVER_TYPE = process.argv[2] === 'admin' ? 'admin' : 'user';
-const PORT = SERVER_TYPE === 'admin' ? 5059 : 8080;
+const PORT = SERVER_TYPE === 'admin' ? 5059 : 5000;
 
 console.log(`Starting ${SERVER_TYPE} server on port ${PORT}`);
 

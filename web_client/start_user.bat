@@ -21,12 +21,12 @@ echo.
 echo Dependencies installed successfully!
 echo.
 
-echo Starting User Server on port 8080...
+echo Starting User Server on port 5000...
 echo.
 echo ===================================================
 echo.
 
-echo IMPORTANT: Open your browser to http://localhost:8080
+echo IMPORTANT: Open your browser to http://localhost:5000
 echo.
 
 call node server.js user
