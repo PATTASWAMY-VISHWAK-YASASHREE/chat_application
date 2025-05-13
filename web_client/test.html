@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+</head>
+<body style="background-color: #333; color: white; font-family: Arial, sans-serif; text-align: center; padding-top: 100px;">
+    <h1>Galaxy Chat Test Page</h1>
+    <p>If you can see this page, the server is working correctly!</p>
+    <p>Server type: <span id="server-type">Checking...</span></p>
+    <p>Port: <span id="port">Checking...</span></p>
+    
+    <script>
+        document.getElementById('server-type').textContent = window.location.port === '5059' ? 'Admin' : 'User';
+        document.getElementById('port').textContent = window.location.port || '(default)';
+    </script>
+</body>
+</html>

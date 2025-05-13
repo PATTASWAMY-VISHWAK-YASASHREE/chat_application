@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f0f1f;
+            color: #e0e0ff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(40, 30, 60, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(100, 100, 255, 0.4);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #a0a0ff;
+        }
+        
+        .login-area {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: rgba(30, 20, 50, 0.8);
+            border-radius: 10px;
+        }
+        
+        .chat-area {
+            display: none;
+        }
+        
+        #messages {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(60, 50, 90, 0.5);
+            border-radius: 10px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .system {
+            text-align: center;
+            color: #a0a0ff;
+            font-style: italic;
+        }
+        
+        .outgoing {
+            background-color: rgba(100, 100, 255, 0.3);
+            margin-left: 50px;
+        }
+        
+        .incoming {
+            background-color: rgba(80, 60, 120, 0.4);
+            margin-right: 50px;
+        }
+        
+        input, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        
+        input {
+            width: 70%;
+            background-color: rgba(70, 60, 100, 0.6);
+            color: white;
+        }
+        
+        button {
+            background-color: rgba(100, 100, 255, 0.6);
+            color: white;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: rgba(120, 120, 255, 0.8);
+        }
+        
+        #users {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(30, 20, 50, 0.8);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Galaxy Chat</h1>
+        
+        <div id="login-area" class="login-area">
+            <h2>Enter Username</h2>
+            <input type="text" id="username" placeholder="Your username">
+            <button id="connect">Connect</button>
+        </div>
+        
+        <div id="chat-area" class="chat-area">
+            <div id="messages"></div>
+            
+            <div>
+                <input type="text" id="message" placeholder="Type a message...">
+                <button id="send">Send</button>
+            </div>
+            
+            <div id="users">
+                <h3>Online Users</h3>
+                <ul id="user-list"></ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const loginArea = document.getElementById('login-area');
+        const chatArea = document.getElementById('chat-area');
+        const usernameInput = document.getElementById('username');
+        const connectButton = document.getElementById('connect');
+        const messageInput = document.getElementById('message');
+        const sendButton = document.getElementById('send');
+        const messagesDiv = document.getElementById('messages');
+        const userList = document.getElementById('user-list');
+        
+        // Connection settings
+        const host = window.location.hostname || 'localhost';
+        const port = window.location.port || 8080;
+        
+        // Chat state
+        let socket = null;
+        let username = '';
+        
+        // Set up event listeners
+        connectButton.addEventListener('click', connect);
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Connect to server
+        function connect() {
+            username = usernameInput.value.trim();
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+            
+            try {
+                socket = new WebSocket(`ws://${host}:${port}`);
+                
+                socket.onopen = function() {
+                    // Send username to server
+                    socket.send(`USERNAME:${username}`);
+                };
+                
+                socket.onmessage = function(event) {
+                    handleMessage(event.data);
+                };
+                
+                socket.onclose = function() {
+                    addSystemMessage('Disconnected from server');
+                    showLoginArea();
+                };
+                
+                socket.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    addSystemMessage('Connection error');
+                    showLoginArea();
+                };
+                
+            } catch (error) {
+                console.error('Connection error:', error);
+                alert('Failed to connect to server');
+            }
+        }
+        
+        // Handle incoming messages
+        function handleMessage(message) {
+            // Try to parse as JSON
+            try {
+                const data = JSON.parse(message);
+                
+                // Handle different message types
+                switch (data.type) {
+                    case 'settings':
+                        handleSettings(data);
+                        break;
+                    case 'user_list':
+                        updateUserList(data.users);
+                        break;
+                    default:
+                        addSystemMessage(message);
+                }
+                
+                return;
+            } catch (e) {
+                // Not JSON, continue with regular message handling
+            }
+            
+            // Handle regular messages
+            if (message.includes(' has joined the chat!') || 
+                message.includes(' has left the chat!') ||
+                message.startsWith('Welcome to the chat')) {
+                addSystemMessage(message);
+            } else {
+                addChatMessage(message);
+            }
+        }
+        
+        // Handle settings message
+        function handleSettings(data) {
+            if (data.username === username) {
+                showChatArea();
+            }
+        }
+        
+        // Show chat area
+        function showChatArea() {
+            loginArea.style.display = 'none';
+            chatArea.style.display = 'block';
+            messageInput.focus();
+        }
+        
+        // Show login area
+        function showLoginArea() {
+            chatArea.style.display = 'none';
+            loginArea.style.display = 'block';
+            usernameInput.focus();
+        }
+        
+        // Send a message
+        function sendMessage() {
+            if (!socket) return;
+            
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            try {
+                socket.send(`${username}: ${message}`);
+                messageInput.value = '';
+                messageInput.focus();
+            } catch (error) {
+                console.error('Failed to send message:', error);
+                addSystemMessage('Failed to send message');
+            }
+        }
+        
+        // Update user list
+        function updateUserList(users) {
+            userList.innerHTML = '';
+            
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = user;
+                userList.appendChild(li);
+            });
+        }
+        
+        // Add a system message
+        function addSystemMessage(text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message system';
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Add a chat message
+        function addChatMessage(text) {
+            const isOutgoing = text.startsWith(`${username}:`);
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
+            messageDiv.textContent = text;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>
