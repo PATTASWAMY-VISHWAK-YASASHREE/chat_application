@@ -6,7 +6,7 @@ echo ===================================================
 echo.
 
 echo Installing dependencies...
-call npm install ws
+call npm install ws pg
 
 if %ERRORLEVEL% NEQ 0 (
     echo.
@@ -32,6 +32,8 @@ echo ===================================================
 echo Both servers started successfully!
 echo.
 echo Check the server windows for the actual ports being used.
+echo.
+echo IMPORTANT: Users need admin approval to join the chat.
 echo ===================================================
 echo.
 
