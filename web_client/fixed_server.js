@@ -170,6 +170,16 @@ wss.on('connection', (ws) => {
                 }
                 
                 if (data.username === ADMIN_USERNAME && data.password === config.ADMIN_PASSWORD) {
+                        // Check if admin is already connected
+                    if (adminClient && adminClient.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            type: 'admin_login_response',
+                            success: false,
+                            message: 'An admin is already connected'
+                        }));
+                        return;
+                    }
+                    
                     // Set as admin
                     adminClient = ws;
                     clientUsernames.set(ws, ADMIN_USERNAME);
@@ -232,12 +242,20 @@ wss.on('connection', (ws) => {
                     return;
                 }
                 
-                adminClient = ws;
-                console.log(`Admin connected to ${SERVER_TYPE} server`);
+                // Don't set adminClient here - it should be set only after proper login
+                console.log(`Admin username attempted on ${SERVER_TYPE} server`);
             }
             
             // Check if user is approved or needs permission
-            if (username === ADMIN_USERNAME || approvedUsers.includes(username)) {
+            if (username === ADMIN_USERNAME && SERVER_TYPE === 'admin') {
+                // Admin needs to use the admin login flow
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    message: 'Please use the admin login form'
+                }));
+                ws.close();
+                return;
+            } else if (approvedUsers.includes(username)) {
                 // User is approved
                 clientUsernames.set(ws, username);
                 activeClients.push(ws);
@@ -408,6 +426,12 @@ wss.on('connection', (ws) => {
     ws.on('close', () => {
         const username = clientUsernames.get(ws) || 'Unknown';
         console.log(`Client ${username} disconnected`);
+        
+        // Check if this was the admin
+        if (ws === adminClient) {
+            console.log('Admin disconnected');
+            adminClient = null;
+        }
         
         // Remove from active clients
         const index = activeClients.indexOf(ws);

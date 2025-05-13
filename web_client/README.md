@@ -1,42 +1,66 @@
-# Web-based Chat Application
+# Galaxy Chat Application
 
-This is a web-based version of the chat application with a modern interface using HTML, CSS, and JavaScript.
+A multi-server chat application with admin approval system and PostgreSQL database integration.
 
-## Features
+## Setup and Running
 
-- Modern Bootstrap UI with responsive design
-- Multiple chat windows in a single browser tab
-- Private messaging with user selection
-- End-to-end encryption for private messages
-- Typing indicators
-- Theme selection
-- WebSocket communication
-- Optional database integration
+### Prerequisites
+- Node.js
+- PostgreSQL (optional)
 
-## How to Run
+### Installation
+1. Install dependencies:
+   ```
+   npm install ws pg
+   ```
 
-1. Install Node.js if you don't have it already
-2. Open a terminal in this directory
-3. Run `npm install` to install dependencies
-4. Run `npm start` to start the server
-5. Open your browser to `http://localhost:5059`
-6. Open multiple browser tabs to simulate multiple users
+### Running the Application
 
-## Database Support
+#### Option 1: Run Admin and User Servers Separately (Recommended)
+1. Start the Admin Server:
+   ```
+   start_admin_server.bat
+   ```
+   This will start the admin server on port 5059 and open the admin interface.
 
-The server will automatically detect if PostgreSQL is available:
-- If PostgreSQL is running and configured, messages will be saved to the database
-- If PostgreSQL is not available, the server will run in "no database" mode
+2. Start the User Server:
+   ```
+   start_user_server.bat
+   ```
+   This will start the user server on port 5000 and open the user interface.
 
-## Using the Chat
+#### Option 2: Run Both Servers Together
+```
+start_all_auto.bat
+```
+This will start both admin and user servers with automatic port selection.
 
-1. Enter a username and click "Connect"
-2. Send messages in the public chat
-3. Click on a user in the sidebar to start a private chat
-4. Use the theme selector to change the appearance
+## Usage
 
-## Performance Improvements
+### Admin Interface
+1. Open http://localhost:5059/admin.html
+2. Login with username "Admin" and password "admin123"
+3. Approve or deny user access requests
 
-- Messages are processed serially to prevent overloading
-- Encryption key generation is faster
-- Database operations are optional
+### User Interface
+1. Open http://localhost:5000
+2. Enter a username and connect
+3. If not approved, you'll be prompted to request access
+4. Once approved, you can join the chat
+
+## Troubleshooting
+
+### Connection Issues
+- Make sure both servers are running
+- Check the console for port information
+- Ensure you're using the correct URLs
+
+### Admin Login Issues
+- Only one admin can be connected at a time
+- Use the admin.html page for admin login
+- Make sure you're connecting to the admin server port
+
+### User Approval Issues
+- Admin must be logged in to approve users
+- Check both server consoles for error messages
+- Restart both servers if issues persist

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat</title>
+    <title>Galaxy Chat</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,8 +34,12 @@
             border-radius: 10px;
         }
         
-        .chat-area {
+        .chat-area, .request-area {
             display: none;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: rgba(30, 20, 50, 0.8);
+            border-radius: 10px;
         }
         
         #messages {
@@ -69,22 +73,29 @@
             margin-right: 50px;
         }
         
-        input, button {
+        input, button, textarea {
             padding: 10px;
             border-radius: 5px;
             border: none;
+            margin-bottom: 10px;
         }
         
-        input {
+        input, textarea {
             width: 70%;
             background-color: rgba(70, 60, 100, 0.6);
             color: white;
+        }
+        
+        textarea {
+            height: 80px;
+            resize: vertical;
         }
         
         button {
             background-color: rgba(100, 100, 255, 0.6);
             color: white;
             cursor: pointer;
+            margin-right: 5px;
         }
         
         button:hover {
@@ -101,12 +112,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>Simple Galaxy Chat</h1>
+        <h1>Galaxy Chat</h1>
         
         <div id="login-area" class="login-area">
             <h2>Enter Username</h2>
             <input type="text" id="username" placeholder="Your username">
             <button id="connect">Connect</button>
+        </div>
+        
+        <div id="request-area" class="request-area">
+            <h2>Request Access</h2>
+            <p>You need admin approval to join this chat.</p>
+            <p>Please provide a reason for your request:</p>
+            <textarea id="request-reason" placeholder="Why do you want to join this chat?"></textarea>
+            <button id="send-request">Send Request</button>
+            <button id="back-to-login">Back</button>
+            <div id="request-status"></div>
         </div>
         
         <div id="chat-area" class="chat-area">
@@ -127,9 +148,14 @@
     <script>
         // DOM Elements
         const loginArea = document.getElementById('login-area');
+        const requestArea = document.getElementById('request-area');
         const chatArea = document.getElementById('chat-area');
         const usernameInput = document.getElementById('username');
         const connectButton = document.getElementById('connect');
+        const requestReasonInput = document.getElementById('request-reason');
+        const sendRequestButton = document.getElementById('send-request');
+        const backToLoginButton = document.getElementById('back-to-login');
+        const requestStatus = document.getElementById('request-status');
         const messageInput = document.getElementById('message');
         const sendButton = document.getElementById('send');
         const messagesDiv = document.getElementById('messages');
@@ -137,52 +163,23 @@
         
         // Connection settings
         const host = window.location.hostname || 'localhost';
-        const port = window.location.port || (window.location.pathname.includes('admin') ? 5059 : 5000);
+        const port = window.location.port || 5000; // Default user port
         
         // Chat state
         let socket = null;
         let username = '';
+        let pendingApproval = false;
         
         // Set up event listeners
         connectButton.addEventListener('click', connect);
+        sendRequestButton.addEventListener('click', sendPermissionRequest);
+        backToLoginButton.addEventListener('click', showLoginArea);
         sendButton.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
-        
-        // Approve a user (admin only)
-        function approveUser(user) {
-            if (!socket) return;
-            
-            try {
-                socket.send(JSON.stringify({
-                    type: 'permission_response',
-                    username: user,
-                    approved: true
-                }));
-                addSystemMessage(`Approved user: ${user}`);
-            } catch (error) {
-                console.error('Failed to approve user:', error);
-            }
-        }
-        
-        // Deny a user (admin only)
-        function denyUser(user) {
-            if (!socket) return;
-            
-            try {
-                socket.send(JSON.stringify({
-                    type: 'permission_response',
-                    username: user,
-                    approved: false
-                }));
-                addSystemMessage(`Denied user: ${user}`);
-            } catch (error) {
-                console.error('Failed to deny user:', error);
-            }
-        }
         
         // Connect to server
         function connect() {
@@ -224,6 +221,37 @@
             }
         }
         
+        // Send permission request
+        function sendPermissionRequest() {
+            if (!socket) {
+                alert('Not connected to server');
+                return;
+            }
+            
+            const reason = requestReasonInput.value.trim();
+            if (!reason) {
+                alert('Please provide a reason for your request');
+                return;
+            }
+            
+            try {
+                socket.send(JSON.stringify({
+                    type: 'permission_request',
+                    username: username,
+                    reason: reason
+                }));
+                
+                requestStatus.textContent = 'Request sent. Waiting for admin approval...';
+                pendingApproval = true;
+                
+                // Disable the send button to prevent multiple requests
+                sendRequestButton.disabled = true;
+            } catch (error) {
+                console.error('Failed to send request:', error);
+                requestStatus.textContent = 'Failed to send request. Please try again.';
+            }
+        }
+        
         // Handle incoming messages
         function handleMessage(message) {
             console.log('Received message:', message);
@@ -245,17 +273,14 @@
                         addSystemMessage('Error: ' + data.message);
                         break;
                     case 'permission_required':
-                        addSystemMessage('Permission required: ' + data.message);
-                        showLoginArea();
+                        showRequestArea();
+                        addSystemMessage(data.message);
                         break;
                     case 'permission_request_received':
-                        addSystemMessage(data.message);
+                        requestStatus.textContent = data.message;
                         break;
                     case 'permission_response':
                         handlePermissionResponse(data);
-                        break;
-                    case 'pending_requests':
-                        handlePendingRequests(data);
                         break;
                     default:
                         addSystemMessage(JSON.stringify(data));
@@ -283,9 +308,6 @@
             if (data.username === username) {
                 showChatArea();
                 addSystemMessage(`Connected as ${username} on ${data.serverType} server`);
-                if (data.isAdmin) {
-                    addSystemMessage('You are logged in as Admin');
-                }
             }
         }
         
@@ -293,39 +315,29 @@
         function handlePermissionResponse(data) {
             if (data.username === username) {
                 if (data.approved) {
-                    addSystemMessage('Your access request was approved! You can now connect.');
+                    addSystemMessage('Your access request was approved!');
+                    pendingApproval = false;
+                    
+                    // Reconnect to join the chat
+                    if (socket && socket.readyState === WebSocket.OPEN) {
+                        socket.close();
+                    }
+                    
+                    setTimeout(() => {
+                        connect();
+                    }, 1000);
                 } else {
                     addSystemMessage('Your access request was denied.');
+                    pendingApproval = false;
+                    showLoginArea();
                 }
-            } else {
-                addSystemMessage(`User ${data.username} was ${data.approved ? 'approved' : 'denied'} access.`);
             }
-        }
-        
-        // Handle pending requests (admin only)
-        function handlePendingRequests(data) {
-            if (!data.requests || data.requests.length === 0) {
-                addSystemMessage('No pending access requests.');
-                return;
-            }
-            
-            addSystemMessage('Pending access requests:');
-            data.requests.forEach(req => {
-                const requestDiv = document.createElement('div');
-                requestDiv.className = 'message system';
-                requestDiv.innerHTML = `
-                    <strong>${req.username}</strong>: ${req.reason || 'No reason provided'}
-                    <button onclick="approveUser('${req.username}')">Approve</button>
-                    <button onclick="denyUser('${req.username}')">Deny</button>
-                `;
-                messagesDiv.appendChild(requestDiv);
-            });
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
         
         // Show chat area
         function showChatArea() {
             loginArea.style.display = 'none';
+            requestArea.style.display = 'none';
             chatArea.style.display = 'block';
             messageInput.focus();
         }
@@ -333,8 +345,23 @@
         // Show login area
         function showLoginArea() {
             chatArea.style.display = 'none';
+            requestArea.style.display = 'none';
             loginArea.style.display = 'block';
             usernameInput.focus();
+            
+            // Reset request form
+            requestReasonInput.value = '';
+            requestStatus.textContent = '';
+            sendRequestButton.disabled = false;
+            pendingApproval = false;
+        }
+        
+        // Show request area
+        function showRequestArea() {
+            loginArea.style.display = 'none';
+            chatArea.style.display = 'none';
+            requestArea.style.display = 'block';
+            requestReasonInput.focus();
         }
         
         // Send a message
