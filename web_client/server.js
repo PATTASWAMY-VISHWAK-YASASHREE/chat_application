@@ -55,7 +55,7 @@ const httpServer = http.createServer((req, res) => {
 });
 
 // Create WebSocket server
-// Removed duplicate declaration of wss
+const wss = new WebSocket.Server({ server: httpServer });
 
 // Handle WebSocket connections
 wss.on('connection', (ws) => {
@@ -77,7 +77,7 @@ wss.on('connection', (ws) => {
 });
 
 // Start the server
-server.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`${SERVER_TYPE} server running on http://localhost:${PORT}`);
     console.log(`Open your browser to http://localhost:${PORT} to view the chat application`);
 });// Try to connect to the database
