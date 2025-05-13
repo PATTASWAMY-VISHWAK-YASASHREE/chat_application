@@ -1,0 +1,162 @@
+2025-05-13 14:54:12,801 - ChatServer - INFO - Starting chat server...
+2025-05-13 14:54:12,802 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 14:54:12,851 - ChatServer - INFO - Database connection established successfully
+2025-05-13 14:54:12,851 - ChatServer - INFO - Creating chat_users table if it doesn't exist
+2025-05-13 14:54:12,865 - ChatServer - INFO - Creating chat_messages table if it doesn't exist
+2025-05-13 14:54:12,865 - ChatServer - INFO - Creating chat_rooms table if it doesn't exist
+2025-05-13 14:54:12,893 - ChatServer - INFO - Creating room_messages table if it doesn't exist
+2025-05-13 14:54:12,898 - ChatServer - INFO - Creating room_members table if it doesn't exist
+2025-05-13 14:54:12,902 - ChatServer - INFO - Creating indexes for better performance
+2025-05-13 14:54:12,907 - ChatServer - INFO - Database schema setup complete
+2025-05-13 14:54:12,907 - ChatServer - INFO - Successfully connected to database: chat_application
+2025-05-13 14:54:12,907 - ChatServer - INFO - Successfully bound to host 127.0.0.1 and port 5059
+2025-05-13 14:54:12,907 - ChatServer - INFO - Server is listening for connections...
+2025-05-13 15:10:01,075 - ChatServer - INFO - New connection from 127.0.0.1:52514
+2025-05-13 15:10:01,083 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:10:01,259 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:10:01,276 - ChatServer - ERROR - Error handling client ('127.0.0.1', 52514): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:10:01,278 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:10:04,840 - ChatServer - INFO - New connection from 127.0.0.1:52516
+2025-05-13 15:10:04,842 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:10:04,996 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:10:04,999 - ChatServer - ERROR - Error handling client ('127.0.0.1', 52516): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:10:04,999 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:10:05,541 - ChatServer - INFO - New connection from 127.0.0.1:52518
+2025-05-13 15:10:05,541 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:10:05,591 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:10:05,593 - ChatServer - ERROR - Error handling client ('127.0.0.1', 52518): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:10:05,593 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:10:05,743 - ChatServer - INFO - New connection from 127.0.0.1:52520
+2025-05-13 15:10:05,744 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:10:05,786 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:10:05,788 - ChatServer - ERROR - Error handling client ('127.0.0.1', 52520): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:10:05,788 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:10:05,946 - ChatServer - INFO - New connection from 127.0.0.1:52522
+2025-05-13 15:10:05,947 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:10:05,990 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:10:05,992 - ChatServer - ERROR - Error handling client ('127.0.0.1', 52522): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:10:05,992 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:10:06,150 - ChatServer - INFO - New connection from 127.0.0.1:52524
+2025-05-13 15:10:06,151 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:10:06,311 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:10:06,313 - ChatServer - ERROR - Error handling client ('127.0.0.1', 52524): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:10:06,313 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:10:34,416 - ChatServer - INFO - 
+Shutdown signal received. Closing server...
+2025-05-13 15:10:34,417 - ChatServer - INFO - Server has been shut down
+2025-05-13 15:12:48,867 - ChatServer - INFO - Starting chat server...
+2025-05-13 15:12:48,867 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:12:48,910 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:12:48,910 - ChatServer - INFO - Creating chat_users table if it doesn't exist
+2025-05-13 15:12:48,917 - ChatServer - INFO - Creating chat_messages table if it doesn't exist
+2025-05-13 15:12:48,918 - ChatServer - INFO - Creating chat_rooms table if it doesn't exist
+2025-05-13 15:12:48,918 - ChatServer - INFO - Creating room_messages table if it doesn't exist
+2025-05-13 15:12:48,918 - ChatServer - INFO - Creating room_members table if it doesn't exist
+2025-05-13 15:12:48,918 - ChatServer - INFO - Creating indexes for better performance
+2025-05-13 15:12:48,923 - ChatServer - INFO - Database schema setup complete
+2025-05-13 15:12:48,923 - ChatServer - INFO - Successfully connected to database: chat_application
+2025-05-13 15:12:48,923 - ChatServer - INFO - Successfully bound to host 127.0.0.1 and port 5059
+2025-05-13 15:12:48,923 - ChatServer - INFO - Server is listening for connections...
+2025-05-13 15:26:20,970 - ChatServer - INFO - Starting chat server...
+2025-05-13 15:26:20,971 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:26:21,022 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:26:21,023 - ChatServer - INFO - Creating chat_users table if it doesn't exist
+2025-05-13 15:26:21,032 - ChatServer - INFO - Creating chat_messages table if it doesn't exist
+2025-05-13 15:26:21,033 - ChatServer - INFO - Creating chat_rooms table if it doesn't exist
+2025-05-13 15:26:21,033 - ChatServer - INFO - Creating room_messages table if it doesn't exist
+2025-05-13 15:26:21,034 - ChatServer - INFO - Creating room_members table if it doesn't exist
+2025-05-13 15:26:21,034 - ChatServer - INFO - Creating indexes for better performance
+2025-05-13 15:26:21,038 - ChatServer - INFO - Database schema setup complete
+2025-05-13 15:26:21,038 - ChatServer - INFO - Successfully connected to database: chat_application
+2025-05-13 15:26:21,039 - ChatServer - INFO - Successfully bound to host :: and port 5059
+2025-05-13 15:26:21,040 - ChatServer - INFO - Server is listening for connections...
+2025-05-13 15:26:25,366 - ChatServer - INFO - 
+Shutdown signal received. Closing server...
+2025-05-13 15:26:25,371 - ChatServer - INFO - Server has been shut down
+2025-05-13 15:42:35,441 - ChatServer - INFO - New connection from ::1:53079
+2025-05-13 15:42:35,448 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:42:35,499 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:42:35,514 - ChatServer - ERROR - Error handling client ('::1', 53079, 0, 0): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:42:35,515 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:42:40,006 - ChatServer - INFO - New connection from ::1:53081
+2025-05-13 15:42:40,007 - ChatServer - INFO - Connecting to database: chat_application on localhost
+2025-05-13 15:42:40,044 - ChatServer - INFO - Database connection established successfully
+2025-05-13 15:42:40,045 - ChatServer - ERROR - Error handling client ('::1', 53081, 0, 0): column "theme" does not exist
+LINE 1: SELECT id, theme FROM chat_users WHERE username = 'User'
+                   ^
+
+2025-05-13 15:42:40,046 - ChatServer - INFO - Client User disconnected
+2025-05-13 15:52:42,864 - ChatServer - INFO - 
+Shutdown signal received. Closing server...
+2025-05-13 15:52:42,874 - ChatServer - INFO - Server has been shut down
+2025-05-13 16:09:40,313 - ChatServer - INFO - Starting chat server (No Database Mode)...
+2025-05-13 16:09:40,315 - ChatServer - INFO - Successfully bound to host 127.0.0.1 and port 5059
+2025-05-13 16:09:40,315 - ChatServer - INFO - Server is listening for connections...
+2025-05-13 16:09:48,576 - ChatServer - INFO - New connection from 127.0.0.1:53579
+2025-05-13 16:09:48,577 - ChatServer - INFO - New client Alice connected from 127.0.0.1:53579
+2025-05-13 16:09:48,584 - ChatServer - INFO - Client Alice disconnected
+2025-05-13 16:09:48,584 - ChatServer - INFO - New connection from 127.0.0.1:53580
+2025-05-13 16:09:48,585 - ChatServer - INFO - New client Alice connected from 127.0.0.1:53580
+2025-05-13 16:09:56,263 - ChatServer - INFO - New connection from 127.0.0.1:53581
+2025-05-13 16:09:56,264 - ChatServer - INFO - New client Bob connected from 127.0.0.1:53581
+2025-05-13 16:09:56,282 - ChatServer - INFO - Client Bob disconnected
+2025-05-13 16:09:56,282 - ChatServer - INFO - New connection from 127.0.0.1:53582
+2025-05-13 16:09:56,283 - ChatServer - INFO - New client Bob connected from 127.0.0.1:53582
+2025-05-13 16:10:00,783 - ChatServer - INFO - New connection from 127.0.0.1:53583
+2025-05-13 16:10:00,784 - ChatServer - INFO - New client Charlie connected from 127.0.0.1:53583
+2025-05-13 16:10:00,790 - ChatServer - INFO - Client Charlie disconnected
+2025-05-13 16:10:00,790 - ChatServer - INFO - New connection from 127.0.0.1:53584
+2025-05-13 16:10:00,791 - ChatServer - INFO - New client Charlie connected from 127.0.0.1:53584
+2025-05-13 16:10:43,225 - ChatServer - INFO - New connection from 127.0.0.1:53620
+2025-05-13 16:10:43,227 - ChatServer - INFO - New client David connected from 127.0.0.1:53620
+2025-05-13 16:10:43,233 - ChatServer - INFO - Client David disconnected
+2025-05-13 16:10:43,233 - ChatServer - INFO - New connection from 127.0.0.1:53621
+2025-05-13 16:10:43,234 - ChatServer - INFO - New client David connected from 127.0.0.1:53621
+2025-05-13 16:12:31,708 - ChatServer - INFO - New connection from 127.0.0.1:53660
+2025-05-13 16:12:31,710 - ChatServer - INFO - New client Frank connected from 127.0.0.1:53660
+2025-05-13 16:12:31,714 - ChatServer - INFO - New connection from 127.0.0.1:53661
+2025-05-13 16:12:31,714 - ChatServer - INFO - Client Frank disconnected
+2025-05-13 16:12:31,715 - ChatServer - INFO - New client Frank connected from 127.0.0.1:53661
+2025-05-13 16:12:39,915 - ChatServer - INFO - New connection from 127.0.0.1:53667
+2025-05-13 16:12:39,916 - ChatServer - INFO - New client Eva connected from 127.0.0.1:53667
+2025-05-13 16:12:39,925 - ChatServer - INFO - Client Eva disconnected
+2025-05-13 16:12:39,925 - ChatServer - INFO - New connection from 127.0.0.1:53668
+2025-05-13 16:12:39,927 - ChatServer - INFO - New client Eva connected from 127.0.0.1:53668
+2025-05-13 16:12:47,033 - ChatServer - ERROR - Error handling client ('127.0.0.1', 53668): [WinError 10054] An existing connection was forcibly closed by the remote host
+2025-05-13 16:12:47,035 - ChatServer - INFO - Client Eva disconnected
+2025-05-13 16:12:49,566 - ChatServer - ERROR - Error handling client ('127.0.0.1', 53661): [WinError 10054] An existing connection was forcibly closed by the remote host
+2025-05-13 16:12:49,567 - ChatServer - INFO - Client Frank disconnected
+2025-05-13 16:13:29,728 - ChatServer - ERROR - Error handling client ('127.0.0.1', 53580): [WinError 10054] An existing connection was forcibly closed by the remote host
+2025-05-13 16:13:29,729 - ChatServer - INFO - Client Alice disconnected
+2025-05-13 16:13:30,583 - ChatServer - ERROR - Error handling client ('127.0.0.1', 53582): [WinError 10054] An existing connection was forcibly closed by the remote host
+2025-05-13 16:13:30,583 - ChatServer - INFO - Client Bob disconnected
+2025-05-13 16:13:31,276 - ChatServer - ERROR - Error handling client ('127.0.0.1', 53584): [WinError 10054] An existing connection was forcibly closed by the remote host
+2025-05-13 16:13:31,276 - ChatServer - INFO - Client Charlie disconnected
+2025-05-13 16:13:32,026 - ChatServer - ERROR - Error handling client ('127.0.0.1', 53621): [WinError 10054] An existing connection was forcibly closed by the remote host
+2025-05-13 16:13:32,026 - ChatServer - INFO - Client David disconnected
+2025-05-13 16:22:57,181 - ChatServer - INFO - New connection from 127.0.0.1:53774
+2025-05-13 16:31:42,204 - ChatServer - INFO - New connection from 127.0.0.1:53918
+2025-05-13 16:39:00,876 - ChatServer - INFO - 
+Shutdown signal received. Closing server...
+2025-05-13 16:39:00,884 - ChatServer - INFO - Server has been shut down

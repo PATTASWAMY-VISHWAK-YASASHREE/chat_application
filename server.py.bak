@@ -1,0 +1,24 @@
+import socket
+import threading
+import sys
+import psycopg2
+import datetime
+import logging
+import signal
+import json
+
+# Use IPv4 address instead of IPv6
+host = '127.0.0.1'  # IPv4 localhost
+port = 5059
+listener_limit = 100
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("server.log"),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger("ChatServer")
